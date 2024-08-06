@@ -1,0 +1,44 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Item {
+  id: ID!
+  name: String!
+  quantity: Float!
+  quantityUnits: String
+}
+
+type Query {
+  items: [Item!]!
+  item(id: ID!): Item!
+}
+
+type Mutation {
+  createItem(createItemInput: CreateItemInput!): Item!
+  updateItem(updateItemInput: UpdateItemInput!): Item!
+  removeItem(id: String!): Item!
+}
+
+input CreateItemInput {
+  """Item name"""
+  name: String!
+
+  """Quantity of item"""
+  quantity: Float!
+
+  """Quantity unit of item"""
+  quantityUnits: String
+}
+
+input UpdateItemInput {
+  """Item name"""
+  name: String
+
+  """Quantity of item"""
+  quantity: Float
+
+  """Quantity unit of item"""
+  quantityUnits: String
+  id: ID!
+}
