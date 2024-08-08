@@ -1,9 +1,11 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SignupInput } from 'src/auth/dto/inputs/signup.input';
 import { AuthHelper } from 'src/auth/helpers/auth.helper';
+import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UserService {
@@ -28,12 +30,25 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.findBy({isActive: true});
+  async findAll(roles: ValidRoles[]): Promise<User[]> {
+
+    if(roles == null || roles.length === 0) {
+      return this.userRepository.findBy({isActive: true})
+    }
+    return this.userRepository.createQueryBuilder()
+    .andWhere({isActive: true})
+    .andWhere('ARRAY[roles] && ARRAY[:...roles]')
+    .setParameter('roles', roles)
+    .getMany();
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({id, isActive: true});
+  async findOne(id: string, isActive: boolean = true): Promise<User> {
+    let where = {id};
+    if(isActive != null) {
+      where['isActive'] = isActive;
+    }
+
+    const user = await this.userRepository.findOneBy(where);
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -47,9 +62,14 @@ export class UserService {
   }
 
   
-  async block(id: string): Promise<User> {
+  async block(id: string, currentUser: User): Promise<User> {
+    if(id === currentUser.id) {
+      throw new BadRequestException('Can not block your own account');
+    }
+
     const user = await this.findOne(id);
     user.isActive = false;
+    user.lastUpdateBy = currentUser;
     return this.userRepository.save(user);
   }
 
@@ -69,6 +89,17 @@ export class UserService {
     return user;
   }
 
+  async update(id: string, updateUserInput: UpdateUserInput, currentUser: User): Promise<User> {
+    await this.findOne(id, null);
+
+    const userToUpdate = await this.userRepository.preload({
+      ...updateUserInput
+    });
+    userToUpdate.lastUpdateBy = currentUser;
+
+    return this.userRepository.save(userToUpdate);
+  }
+
   private handleDBError(error: any): never {
     if (error.code === '23505') {
       throw new BadRequestException('User already exists');
@@ -79,11 +110,7 @@ export class UserService {
 
     throw new InternalServerErrorException('Please check server logs');
   }
-
-  /*update(id: string, updateUserInput: UpdateUserInput) {
-    throw new Error('Method not implemented.');
-  }
-
+/*
   remove(id: string) {
     throw new Error('Method not implemented.');
   }*/
