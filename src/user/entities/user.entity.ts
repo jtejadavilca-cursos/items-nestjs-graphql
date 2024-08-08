@@ -47,7 +47,7 @@ export class User {
     (item) => item.user,
     { lazy: true}
   )
-  @Field(() => [Item])
+  //@Field(() => [Item])
   items: Item[]
 
 }

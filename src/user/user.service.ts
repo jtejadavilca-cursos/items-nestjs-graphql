@@ -6,6 +6,8 @@ import { SignupInput } from 'src/auth/dto/inputs/signup.input';
 import { AuthHelper } from 'src/auth/helpers/auth.helper';
 import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
 import { UpdateUserInput } from './dto/update-user.input';
+import { PaginationArgs } from 'src/common/dto/args/pagination.args';
+import { SearchArgs } from 'src/common/dto/args/search.args';
 
 @Injectable()
 export class UserService {
@@ -30,16 +32,31 @@ export class UserService {
     }
   }
 
-  async findAll(roles: ValidRoles[]): Promise<User[]> {
+  async findAll(
+    roles: ValidRoles[],
+    pagination: PaginationArgs,
+    search: SearchArgs
+  ): Promise<User[]> {
+
+
+    const {offset, limit} = pagination;
+    const {term} = search;
 
     if(roles == null || roles.length === 0) {
       return this.userRepository.findBy({isActive: true})
     }
-    return this.userRepository.createQueryBuilder()
-    .andWhere({isActive: true})
+    const queryBuilder = this.userRepository.createQueryBuilder()
+    .take(limit)
+    .skip(offset)
+    .where({isActive: true})
     .andWhere('ARRAY[roles] && ARRAY[:...roles]')
-    .setParameter('roles', roles)
-    .getMany();
+    .setParameter('roles', roles);
+
+    if(term) {
+      queryBuilder.andWhere('LOWER("fullName") like :fullName', {fullName: `%${term.toLowerCase()}%`})
+    }
+
+    return queryBuilder.getMany();
   }
 
   async findOne(id: string, isActive: boolean = true): Promise<User> {

@@ -13,7 +13,7 @@ export const GetCurrentUser = createParamDecorator(
             throw new InternalServerErrorException('User not found in the request - (Are we using @AuthGuard?)');
         }
 
-        if(roles && user.roles.some(role => !roles.includes(role as ValidRoles))) {
+        if(roles && !user.roles.some(role => roles.includes(role as ValidRoles))) {
             throw new ForbiddenException('User does not have the required roles');
         }
 

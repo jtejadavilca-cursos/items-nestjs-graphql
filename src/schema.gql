@@ -10,8 +10,8 @@ type User {
   roles: [String!]!
   isActive: Boolean!
   lastUpdateBy: User
-  items: [Item!]!
   itemCount: Int!
+  items(offset: Int = 0, limit: Int = 10, term: String): [Item!]!
 }
 
 type Item {
@@ -28,16 +28,16 @@ type AuthResponse {
 
 type Query {
   revalidate: AuthResponse!
-  users(roles: [ValidRoles!] = []): [User!]!
+  users(offset: Int = 0, limit: Int = 10, term: String, roles: [ValidRoles!] = []): [User!]!
   user(id: ID!): User!
-  items: [Item!]!
+  items(offset: Int = 0, limit: Int = 10, term: String): [Item!]!
   item(id: ID!): Item!
 }
 
 enum ValidRoles {
   admin
   user
-  superuser
+  superUser
 }
 
 type Mutation {
