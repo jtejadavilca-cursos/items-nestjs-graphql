@@ -5,6 +5,7 @@ import { Item } from './entities/item.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Args } from '@nestjs/graphql';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ItemsService {
@@ -14,42 +15,43 @@ export class ItemsService {
     private readonly itemsRepository: Repository<Item>,
   ) {}
 
-  private items: Item[] = [
-    //{id: 1},{id: 2},{id: 3},{id: 4},{id: 5},{id: 6},
-  ]
-
-  async create(createItemInput: CreateItemInput): Promise<Item> {
+  async create(createItemInput: CreateItemInput, createdBy: User): Promise<Item> {
 
     const newItem = this.itemsRepository.create(createItemInput);
+    newItem.user = createdBy;
 
     return await this.itemsRepository.save(newItem);;
   }
 
-  async findAll(): Promise<Item[]> {
-    return await this.itemsRepository.find();
+  async findAll(owner: User): Promise<Item[]> {
+    return await this.itemsRepository.find({where: {user: owner}});
   }
 
-  async findOne(id: string): Promise<Item> {
-    const item = await this.itemsRepository.findOne({where: {id: id}});
+  async findOne(id: string, owner: User): Promise<Item> {
+    const item = await this.itemsRepository.findOne({where: {id: id, user: owner}});
     if(!item) {
       throw new NotFoundException(`Item with id=${id} not found`);
     }
     return item;
   }
 
-  async update(id: string, updateItemInput: UpdateItemInput): Promise<Item> {
-    this.findOne(updateItemInput.id);
+  async update(id: string, updateItemInput: UpdateItemInput, owner: User): Promise<Item> {
+    this.findOne(updateItemInput.id, owner);
 
     const itemToUpdate = await this.itemsRepository.preload(updateItemInput);
 
     return this.itemsRepository.save(itemToUpdate);
   }
 
-  async remove(id: string): Promise<Item> {
-    const item = await this.findOne(id);
+  async remove(id: string, owner: User): Promise<Item> {
+    const item = await this.findOne(id, owner);
 
     await this.itemsRepository.delete(item);
 
     return item;
+  }
+
+  async itemCountByUser(user: User): Promise<number> {
+    return this.itemsRepository.count({where: {user}});
   }
 }

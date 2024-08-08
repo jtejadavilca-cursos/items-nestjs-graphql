@@ -9,10 +9,12 @@ export class CreateItemInput {
   @MaxLength(30)
   name: string;
 
+  /*
   @Field(() => Float, { description: 'Quantity of item' })
   @IsNumber()
   @Min(0)
   quantity: number;
+  */
 
   @Field(() => String, { description: 'Quantity unit of item', nullable: true })
   @IsOptional()

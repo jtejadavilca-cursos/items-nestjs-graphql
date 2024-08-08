@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, ResolveField, Int, Parent } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 
@@ -8,11 +8,15 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetCurrentUser } from 'src/auth/decorators/get-current-user.decorator';
 import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
 import { UpdateUserInput } from './dto/update-user.input';
+import { ItemsService } from 'src/items/items.service';
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly itemsService: ItemsService
+  ) {}
 
   /*@Mutation(() => User)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
@@ -51,6 +55,15 @@ export class UserResolver {
   ): Promise<User> {
     return this.userService.update(updateUserInput.id, updateUserInput, user);
   }
+
+  @ResolveField(() => Int)
+  async itemCount(
+    @Parent() user: User
+  ): Promise<number> {
+    return this.itemsService.itemCountByUser(user);
+  }
+
+  
 /*
   @Mutation(() => User)
   removeUser(@Args('id', { type: () => ID }) id: string) {

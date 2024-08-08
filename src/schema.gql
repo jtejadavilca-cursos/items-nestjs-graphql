@@ -2,13 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Item {
-  id: ID!
-  name: String!
-  quantity: Float!
-  quantityUnits: String
-}
-
 type User {
   """Example field (placeholder)"""
   id: ID!
@@ -17,6 +10,15 @@ type User {
   roles: [String!]!
   isActive: Boolean!
   lastUpdateBy: User
+  items: [Item!]!
+  itemCount: Int!
+}
+
+type Item {
+  id: ID!
+  name: String!
+  quantityUnits: String
+  user: User!
 }
 
 type AuthResponse {
@@ -80,9 +82,6 @@ input CreateItemInput {
   """Item name"""
   name: String!
 
-  """Quantity of item"""
-  quantity: Float!
-
   """Quantity unit of item"""
   quantityUnits: String
 }
@@ -90,9 +89,6 @@ input CreateItemInput {
 input UpdateItemInput {
   """Item name"""
   name: String
-
-  """Quantity of item"""
-  quantity: Float
 
   """Quantity unit of item"""
   quantityUnits: String
