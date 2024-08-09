@@ -22,3 +22,10 @@ docker compose up -d
 ```
 yarn start:dev
 ```
+
+7. Entrar por el navegador al sitio:
+```
+localhost:3000/graphql
+```
+
+8. Ejecutar la __"mutation"__ ```executeSeed```, para llenar la base de datos con información de prueba.
