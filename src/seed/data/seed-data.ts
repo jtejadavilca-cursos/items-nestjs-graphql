@@ -1,3 +1,5 @@
+import { List } from "src/lists/entities/list.entity";
+
 export const SEED_USERS = [
     {
         fullName: 'Fernando Herrera',
@@ -540,3 +542,25 @@ export const SEED_ITEMS = [
     },
 ]
 
+export const SEED_LISTS = [
+    {
+        name: "Primera lista",
+        description: "Decripcion de la primera lista"
+    },
+    {
+        name: "Segunda lista",
+        description: "Decripcion de la segunda lista"
+    },
+    {
+        name: "Tercerca lista",
+        description: "Decripcion de la tercerca lista"
+    },
+    {
+        name: "Cuarta lista",
+        description: "Decripcion de la cuarta lista"
+    },
+    {
+        name: "Quinta lista",
+        description: "Decripcion de la quinta lista"
+    }
+];

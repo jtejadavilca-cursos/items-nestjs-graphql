@@ -21,5 +21,5 @@ export class CreateListItemInput {
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
-  completed: boolean = false;
+  completed?: boolean = false;
 }
