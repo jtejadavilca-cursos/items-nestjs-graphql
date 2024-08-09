@@ -12,13 +12,16 @@ import { ItemsService } from 'src/items/items.service';
 import { Item } from 'src/items/entities/item.entity';
 import { PaginationArgs } from 'src/common/dto/args/pagination.args';
 import { SearchArgs } from 'src/common/dto/args/search.args';
+import { ListsService } from 'src/lists/lists.service';
+import { List } from 'src/lists/entities/list.entity';
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
-    private readonly itemsService: ItemsService
+    private readonly itemsService: ItemsService,
+    private readonly listsService: ListsService,
   ) {}
 
   /*@Mutation(() => User)
@@ -77,6 +80,16 @@ export class UserResolver {
     @Args() search: SearchArgs,
   ): Promise<Item[]> {
     return this.itemsService.findAll(user, pagination, search);
+  }
+
+  @ResolveField(() => [List])
+  async lists(
+    @GetCurrentUser() adminUser: User,
+    @Parent() user: User,
+    @Args() pagination: PaginationArgs,
+    @Args() search: SearchArgs,
+  ): Promise<List[]> {
+    return this.listsService.findAll(user, pagination, search);
   }
   
 /*

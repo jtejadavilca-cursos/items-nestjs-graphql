@@ -42,7 +42,7 @@ export class ItemsResolver {
   }
 
   @Mutation(() => Item)
-  updateItem(
+  async updateItem(
     @Args('updateItemInput') updateItemInput: UpdateItemInput,
     @GetCurrentUser() user: User
   ): Promise<Item> {
@@ -50,7 +50,7 @@ export class ItemsResolver {
   }
 
   @Mutation(() => Item)
-  removeItem(
+  async removeItem(
     @Args('id', { type: () => String }) id: string,
     @GetCurrentUser() user: User
   ): Promise<Item> {

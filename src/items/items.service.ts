@@ -45,7 +45,7 @@ export class ItemsService {
   }
 
   async findOne(id: string, owner: User): Promise<Item> {
-    const item = await this.itemsRepository.findOne({where: {id: id, user: owner}});
+    const item = await this.itemsRepository.findOne({where: {id, user: owner}});
     if(!item) {
       throw new NotFoundException(`Item with id=${id} not found`);
     }
@@ -53,11 +53,11 @@ export class ItemsService {
   }
 
   async update(id: string, updateItemInput: UpdateItemInput, owner: User): Promise<Item> {
-    this.findOne(updateItemInput.id, owner);
+    this.findOne(id, owner);
 
     const itemToUpdate = await this.itemsRepository.preload(updateItemInput);
 
-    return this.itemsRepository.save(itemToUpdate);
+    return await this.itemsRepository.save(itemToUpdate);
   }
 
   async remove(id: string, owner: User): Promise<Item> {
